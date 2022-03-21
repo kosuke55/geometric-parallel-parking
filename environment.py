@@ -133,9 +133,10 @@ class Parking1:
             [[40, 34], [40 + self.car_grid_length + self.parking_grid_length, 34]])
 
         self.end = np.mean(self.cars, axis=0, dtype=np.int64)
-        print(self.cars)
         print(self.end)
         self.cars -= np.array([self.end[0] - 50, 0])
+        self.end = np.mean(self.cars, axis=0, dtype=np.int64)
+        print(self.end)
         # self.end = self.cars[car_pos][0]
 
     def generate_obstacles(self):
