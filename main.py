@@ -8,12 +8,11 @@ from control import Car_Dynamics, MPC_Controller, Linear_MPC_Controller
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--x_start', type=int, default=0, help='X of start')
-    parser.add_argument('--y_start', type=int, default=90, help='Y of start')
-    parser.add_argument('--psi_start', type=int, default=0, help='psi of start')
+    parser.add_argument('--x_start', type=int, default=50, help='X of start')
+    parser.add_argument('--y_start', type=int, default=50, help='Y of start')
+    parser.add_argument('--psi_start', type=int, default=10, help='psi of start')
     parser.add_argument('--x_end', type=int, default=90, help='X of end')
     parser.add_argument('--y_end', type=int, default=80, help='Y of end')
-    # parser.add_argument('--parking', type=int, default=1, help='park position in parking1 out of 24')
 
     args = parser.parse_args()
 
