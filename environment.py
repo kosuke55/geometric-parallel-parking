@@ -3,15 +3,20 @@ import numpy as np
 
 
 class Environment:
-    def __init__(self, obstacles):
+    def __init__(self, obstacles,
+                 car_length=80,
+                 car_width=40,
+                 wheel_length=15,
+                 wheel_width=7,
+                 wheel_positions=np.array([[25, 15], [25, -15], [-25, 15], [-25, -15]])
+                 ):
         self.margin = 5
         # coordinates are in [x,y] format
-        self.car_length = 80
-        self.car_width = 40
-        self.wheel_length = 15
-        self.wheel_width = 7
-        self.wheel_positions = np.array(
-            [[25, 15], [25, -15], [-25, 15], [-25, -15]])
+        self.car_length = car_length
+        self.car_width = car_width
+        self.wheel_length = wheel_length
+        self.wheel_width = wheel_width
+        self.wheel_positions = wheel_positions
 
         self.color = np.array([0, 0, 255]) / 255
         self.wheel_color = np.array([20, 20, 20]) / 255
@@ -51,17 +56,9 @@ class Environment:
         color = np.random.randint(0, 150, 3) / 255
         path = path.astype(int)
         for p in path:
-            self.background[p[1] +
-                            10 *
-                            self.margin:p[1] +
-                            10 *
-                            self.margin +
-                            3, p[0] +
-                            10 *
-                            self.margin:p[0] +
-                            10 *
-                            self.margin +
-                            3] = color
+            self.background[
+                p[1] + 10 * self.margin:p[1] + 10 * self.margin + 3,
+                p[0] + 10 * self.margin:p[0] + 10 * self.margin + 3] = color
 
     def rotate_car(self, pts, angle=0):
         R = np.array([[np.cos(angle), -np.sin(angle)],

@@ -20,10 +20,28 @@ if __name__ == '__main__':
     start = np.array([args.x_start, args.y_start])
     end   = np.array([args.x_end, args.y_end])
 
+    # in 1000 coordinates
+    car_length = 80
+    car_width = 40
+    wheel_length = 15
+    wheel_width = 7
+    # [0,0] is car's center
+    wheel_positions = np.array([[25, 15], [25, -15], [-25, 15], [-25, -15]])
+    d_front = car_length / 2 - wheel_positions[0][0]
+    d_rear = car_length / 2 - (-wheel_positions[2][0])
+    d_l = car_width / 2 - wheel_positions[0][1]
+    d_r = car_width / 2 - (-wheel_positions[1][1])
+    psi_max = 40
+
     parking1 = Parking1(1)
     end, obs = parking1.generate_obstacles()
-
-    env = Environment(obs)
+    env = Environment(
+        obs,
+        car_length,
+        car_width,
+        wheel_length,
+        wheel_width,
+        wheel_positions)
     my_car = Car_Dynamics(start[0], start[1], 0, np.deg2rad(args.psi_start), length=4, dt=0.2)
 
     MPC_HORIZON = 5
