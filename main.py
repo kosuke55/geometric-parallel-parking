@@ -9,7 +9,7 @@ from pathplanning import PathPlanning
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--x_start', type=int, default=30, help='X of start')
+    parser.add_argument('--x_start', type=int, default=80, help='X of start')
     parser.add_argument('--y_start', type=int, default=50, help='Y of start')
     parser.add_argument('--psi_start', type=int, default=0, help='psi of start')
     parser.add_argument('--x_end', type=int, default=90, help='X of end')
