@@ -18,6 +18,16 @@ class Environment:
         self.wheel_width = wheel_width
         self.wheel_positions = wheel_positions
 
+        self.d_front = car_length / 2 - wheel_positions[0][0]
+        self.d_rear = car_length / 2 - (-wheel_positions[2][0])
+        self.a = car_length - self.d_rear - self.d_front
+        self.d_l = car_width / 2 - wheel_positions[0][1]
+        self.d_r = car_width / 2 - (-wheel_positions[1][1])
+        # print(self.d_l, self.d_r)
+        self.b = (car_width - self.d_l - self.d_r) / 2
+        self.steer_max = np.deg2rad(70)
+        # print("self.steer_max: ", self.steer_max)
+
         self.color = np.array([0, 0, 255]) / 255
         self.wheel_color = np.array([20, 20, 20]) / 255
 
@@ -53,9 +63,13 @@ class Environment:
 
     def draw_path(self, path):
         path = np.array(path) * 10
+        # path = np.array(path)
         color = np.random.randint(0, 150, 3) / 255
         path = path.astype(int)
         for p in path:
+            # self.background[
+            #     p[1] + self.margin:p[1] + self.margin + 3,
+            #     p[0] + self.margin:p[0] + self.margin + 3] = color
             self.background[
                 p[1] + 10 * self.margin:p[1] + 10 * self.margin + 3,
                 p[0] + 10 * self.margin:p[0] + 10 * self.margin + 3] = color
@@ -113,7 +127,7 @@ class Environment:
 
 
 class Parking1:
-    def __init__(self, car_pos, parking_length=150):
+    def __init__(self, car_pos, parking_length=200):
         self.car_length = 80
         self.car_grid_length = int(80 / 10)
         self.car_width = 40
@@ -127,12 +141,15 @@ class Parking1:
         # self.cars = {1: [[40, 34]], 2: [[40 + parking_length , 34]]}
 
         self.cars = np.array(
-            [[40, 34], [40 + 1 + self.car_grid_length + self.parking_grid_length, 34]])
+            [[40, 34], [int(40 + self.car_grid_length / 2 + self.parking_grid_length), 34]])
 
         self.end = np.mean(self.cars, axis=0, dtype=np.int64)
         self.cars -= np.array([self.end[0] - 50, 0])
-        self.end = np.mean(self.cars, axis=0, dtype=np.int64)
-        print(self.cars, self.end)
+
+        self.parking_margin = 10
+        self.end -= [int((parking_length / 2 - self.parking_margin - self.car_length / 2) / 10), 0]
+        # self.end = np.mean(self.cars, axis=0, dtype=np.int64)
+        # print(self.cars, self.end)
         # self.end = self.cars[car_pos][0]
 
     def generate_obstacles(self):
