@@ -18,14 +18,15 @@ class Environment:
         self.wheel_width = wheel_width
         self.wheel_positions = wheel_positions
 
-        self.d_front = car_length / 2 - wheel_positions[0][0]
-        self.d_rear = car_length / 2 - (-wheel_positions[2][0])
-        self.a = car_length - self.d_rear - self.d_front
-        self.d_l = car_width / 2 - wheel_positions[0][1]
-        self.d_r = car_width / 2 - (-wheel_positions[1][1])
+        # planningは100coordinateで計算する。以下はcarの方に移動したほうが良いかも.
+        self.d_front = (car_length / 2 - wheel_positions[0][0]) / 10
+        self.d_rear = (car_length / 2 - (-wheel_positions[2][0])) / 10
+        self.a = car_length / 10 - self.d_rear - self.d_front
+        self.d_l = (car_width / 2 - wheel_positions[0][1]) / 10
+        self.d_r = (car_width / 2 - (-wheel_positions[1][1])) / 10
         # print(self.d_l, self.d_r)
-        self.b = (car_width - self.d_l - self.d_r) / 2
-        self.steer_max = np.deg2rad(70)
+        self.b = (car_width / 10 - self.d_l - self.d_r) / 2
+        self.steer_max = np.deg2rad(40)
         # print("self.steer_max: ", self.steer_max)
 
         self.color = np.array([0, 0, 255]) / 255
@@ -141,7 +142,7 @@ class Parking1:
         # self.cars = {1: [[40, 34]], 2: [[40 + parking_length , 34]]}
 
         self.cars = np.array(
-            [[40, 34], [int(40 + self.car_grid_length / 2 + self.parking_grid_length), 34]])
+            [[40, 35], [int(40 + self.car_grid_length / 2 + self.parking_grid_length), 35]])
 
         self.end = np.mean(self.cars, axis=0, dtype=np.int64)
         self.cars -= np.array([self.end[0] - 50, 0])

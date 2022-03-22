@@ -51,19 +51,34 @@ class PathPlanning:
             (R_E_init_r**2 + (R_E_init_r + self.R_Elmin)**2 - C_l2E_init**2)
             / (2 * R_E_init_r * (R_E_init_r + self.R_Elmin)))
 
+        point_interval = 0.5
         path = [[sx, sy]]
         # print(beta)
         t = np.pi / 2 + sphi
         print(path, C_r + R_E_init_r * np.array([np.cos(t), np.sin(t)]))
-        for theta in np.linspace(0, beta, 30):
+        theta = 0
+        while theta < beta:
             t = np.pi / 2 + sphi + theta
-            path.append(C_r + R_E_init_r * np.array([np.cos(t), np.sin(t)]))
+            p_current = C_r + R_E_init_r * np.array([np.cos(t), np.sin(t)])
+            distance = np.linalg.norm([path[-1] - p_current])
+            if distance > point_interval:
+                print(distance)
+                path.append(p_current)
+            theta += 0.01
             # path.append(C_r + (R_E_init_r * np.array([np.cos(t), np.sin(t)])) - [0, 1])p
 
             # print(C_r + R_E_init_r * np.array([np.cos(t), np.sin(t)]))
 
-        for theta in np.linspace(beta + sphi, 0, 30):
+        # for theta in np.linspace(beta + sphi, 0, 30):
+        theta = beta + sphi
+        while theta > 0:
             t = -np.pi / 2 + theta
-            path.append(C_l + self.R_Elmin * np.array([np.cos(t), np.sin(t)]))
+            p_current = C_l + self.R_Elmin * np.array([np.cos(t), np.sin(t)])
+            distance = np.linalg.norm([path[-1] - p_current])
+            if distance > point_interval:
+                print(distance)
+                path.append(p_current)
+            theta -= 0.01
+
 
         return np.array(path)
