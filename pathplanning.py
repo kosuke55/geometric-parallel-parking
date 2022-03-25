@@ -16,9 +16,11 @@ class PathPlanning:
         print("self.R_Bl_min: ", self.R_Bl_min)
         # print(np.sqrt((self.R_Elmin + self.env.b + self.env.d_r)**2 + (self.env.a + self.env.d_front)**2))
         self.L_min = self.env.d_rear + np.sqrt(self.R_Bl_min**2 - (self.env.a / np.tan(self.env.steer_max) - self.env.b - self.env.d_l)**2)
-        print("L_min: ", self.L_min)
+        print("L_min:{} ,+margin:{}".format(self.L_min,
+              self.L_min + self.env.parking_margin))
+        
 
-        self.margin = 5
+        # self.margin = 5
         # sacale obstacles from env margin to pathplanning margin
         # obstacles = obstacles + np.array([self.margin, self.margin])
 
