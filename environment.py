@@ -4,14 +4,14 @@ import numpy as np
 
 class Environment:
     def __init__(self, obstacles,
-                 car_length=80,
-                 car_width=40,
-                 wheel_length=15,
-                 wheel_width=7,
+                 car_length=80,  # 8m
+                 car_width=40,  # 4m
+                 wheel_length=15,  # 1.5m
+                 wheel_width=7,  # 0.7m
                  wheel_positions=np.array([[25, 15], [25, -15], [-25, 15], [-25, -15]])
                  ):
         self.margin = 5
-        # coordinates are in [x,y] format
+        # coordinates are in [x,y] format, 1000 coordinates
         self.car_length = car_length
         self.car_width = car_width
         self.wheel_length = wheel_length
@@ -152,11 +152,11 @@ class Environment:
 
 
 class Parking1:
-    def __init__(self, car_pos, parking_length=200):
-        self.car_length = 80
+    def __init__(self, parking_length=20):
+        self.car_length = 80  # in 1000 coordinates, 8m
         self.car_grid_length = int(80 / 10)
-        self.car_width = 40
-        self.parking_grid_length = int(parking_length / 10)
+        self.car_width = 40  # in 1000 coordinates, 4m
+        self.parking_length = parking_length  # [m]
 
         self.car_obstacle = self.make_car()
         self.walls = [[i, 30] for i in range(-5, 105)] +\
@@ -166,16 +166,13 @@ class Parking1:
         # self.cars = {1: [[40, 34]], 2: [[40 + parking_length , 34]]}
 
         self.cars = np.array(
-            [[40, 35], [int(40 + self.car_grid_length / 2 + self.parking_grid_length), 35]])
+            [[40, 35], [int(40 + self.car_grid_length / 2 + self.parking_length), 35]])
 
         self.end = np.mean(self.cars, axis=0, dtype=np.int64)
         self.cars -= np.array([self.end[0] - 50, 0])
 
-        self.parking_margin = 10
-        self.end -= [int((parking_length / 2 - self.parking_margin - self.car_length / 2) / 10), 0]
-        # self.end = np.mean(self.cars, axis=0, dtype=np.int64)
-        # print(self.cars, self.end)
-        # self.end = self.cars[car_pos][0]
+        self.parking_margin = 1  # [m]
+        self.end -= [int(parking_length / 2 - self.parking_margin - self.car_length / 10 / 2), 0]
 
     def generate_obstacles(self):
         for car in self.cars:

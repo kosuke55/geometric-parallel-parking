@@ -14,6 +14,7 @@ if __name__ == '__main__':
     parser.add_argument('--psi_start', type=int, default=-30, help='psi of start')
     parser.add_argument('--x_end', type=int, default=90, help='X of end')
     parser.add_argument('--y_end', type=int, default=80, help='Y of end')
+    parser.add_argument('--parking_length', type=int, default=20, help='parking_length [m]')
 
     args = parser.parse_args()
 
@@ -28,7 +29,7 @@ if __name__ == '__main__':
     wheel_positions = np.array(
         [[25, 15], [25, -15], [-25, 15], [-25, -15]])  # [0,0] is car's center
 
-    parking1 = Parking1(1, 200)
+    parking1 = Parking1(args.parking_length)
     end, obs = parking1.generate_obstacles()
 
     env = Environment(
