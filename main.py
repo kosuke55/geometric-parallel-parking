@@ -9,8 +9,8 @@ from pathplanning import PathPlanning
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--x_start', type=int, default=90, help='X of start')
-    parser.add_argument('--y_start', type=int, default=50, help='Y of start')
+    parser.add_argument('--x_start', type=int, default=75, help='X of start')
+    parser.add_argument('--y_start', type=int, default=45, help='Y of start')
     parser.add_argument('--psi_start', type=int, default=-30, help='psi of start')
     parser.add_argument('--x_end', type=int, default=90, help='X of end')
     parser.add_argument('--y_end', type=int, default=80, help='Y of end')
@@ -59,6 +59,9 @@ if __name__ == '__main__':
         acc, delta = controller.optimize(my_car, path[i:i+MPC_HORIZON])
         my_car.update_state(my_car.move(acc,  delta))
         res = env.render(my_car.x, my_car.y, my_car.psi, delta)
+        is_collision = env.check_collision(my_car.x, my_car.y, my_car.psi)
+        if is_collision:
+            break
         cv2.imshow('environment', res)
         key = cv2.waitKey(1)
         if key == ord('s'):

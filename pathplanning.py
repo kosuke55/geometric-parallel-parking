@@ -53,16 +53,12 @@ class PathPlanning:
 
         point_interval = 0.5
         path = [[sx, sy]]
-        # print(beta)
-        t = np.pi / 2 + sphi
-        print(path, C_r + R_E_init_r * np.array([np.cos(t), np.sin(t)]))
         theta = 0
         while theta < beta:
             t = np.pi / 2 + sphi + theta
             p_current = C_r + R_E_init_r * np.array([np.cos(t), np.sin(t)])
             distance = np.linalg.norm([path[-1] - p_current])
             if distance > point_interval:
-                print(distance)
                 path.append(p_current)
             theta += 0.01
             # path.append(C_r + (R_E_init_r * np.array([np.cos(t), np.sin(t)])) - [0, 1])p
@@ -76,7 +72,6 @@ class PathPlanning:
             p_current = C_l + self.R_Elmin * np.array([np.cos(t), np.sin(t)])
             distance = np.linalg.norm([path[-1] - p_current])
             if distance > point_interval:
-                print(distance)
                 path.append(p_current)
             theta -= 0.01
 

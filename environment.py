@@ -51,16 +51,23 @@ class Environment:
                         :] = np.array([200, 200, 200]) / 255
         self.background[:, 10:1000 + 20 *
                         self.margin:10] = np.array([200, 200, 200]) / 255
-        self.place_obstacles(obstacles)
+        self.background = self.place_obstacles(self.background, obstacles, 0)
 
-    def place_obstacles(self, obs):
+        # for collision check
+        self.obstacles_mask = np.zeros_like(self.background)
+        self.obstacles_mask = self.place_obstacles(
+            self.obstacles_mask, obstacles, 1)
+
+    def place_obstacles(self, arr, obs, val):
         obstacles = np.concatenate([np.array([[0, i] for i in range(100 + 2 * self.margin)]),
                                     np.array([[100 + 2 * self.margin - 1, i] for i in range(100 + 2 * self.margin)]),
                                     np.array([[i, 0] for i in range(100 + 2 * self.margin)]),
                                     np.array([[i, 100 + 2 * self.margin - 1] for i in range(100 + 2 * self.margin)]),
                                     obs + np.array([self.margin, self.margin])]) * 10
         for ob in obstacles:
-            self.background[ob[1]:ob[1] + 10, ob[0]:ob[0] + 10] = 0
+            # self.background[ob[1]:ob[1] + 10, ob[0]:ob[0] + 10] = 0
+            arr[ob[1]:ob[1] + 10, ob[0]:ob[0] + 10] = val
+        return arr
 
     def draw_path(self, path):
         path = np.array(path) * 10
@@ -84,11 +91,12 @@ class Environment:
         # x,y in 100 coordinates
         x = int(10 * x)
         y = int(10 * y)
-        # x,y in 1000 coordinates
+        # x,y in 1000 coordinates 10=1m
         # adding car body
         rotated_struct = self.rotate_car(self.car_struct, angle=psi)
         rotated_struct += np.array([x, y]) + \
             np.array([10 * self.margin, 10 * self.margin])
+
         rendered = cv2.fillPoly(
             self.background.copy(),
             [rotated_struct],
@@ -125,6 +133,22 @@ class Environment:
 
         rendered = cv2.resize(np.flip(rendered, axis=0), (700, 700))
         return rendered
+
+    def check_collision(self, x, y, psi):
+        # x,y in 100 coordinates
+        x = int(10 * x)
+        y = int(10 * y)
+        # adding car body
+        rotated_struct = self.rotate_car(self.car_struct, angle=psi)
+        rotated_struct += np.array([x, y]) + \
+            np.array([10 * self.margin, 10 * self.margin])
+        car_mask = cv2.fillPoly(
+            np.zeros_like(self.background),
+            [rotated_struct],
+            [1, 1, 1])
+        collision_mask = cv2.bitwise_and(self.obstacles_mask, car_mask)
+
+        return np.any(collision_mask == 1)
 
 
 class Parking1:
