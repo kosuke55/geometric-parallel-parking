@@ -33,13 +33,13 @@ class Car_Dynamics:
         self.wheel_length = wheel_length
         self.wheel_width = wheel_width
         self.wheel_positions = wheel_positions
-        # planningは100coordinateで計算する。以下はcarの方に移動したほうが良いかも.
+
         self.d_front = car_length / 2 - wheel_positions[0][0]
         self.d_rear = car_length / 2 - (-wheel_positions[2][0])
         self.a = car_length - self.d_rear - self.d_front
         self.d_l = car_width / 2 - wheel_positions[0][1]
         self.d_r = car_width / 2 - (-wheel_positions[1][1])
-        self.b = car_width - self.d_l - self.d_r
+        self.b = (car_width - self.d_l - self.d_r) / 2
         self.steer_max = np.deg2rad(40)
 
     def move(self, accelerate, delta):

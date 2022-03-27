@@ -14,7 +14,7 @@ class Environment:
                  parking_margin=1
                  ):
         self.car = car
-        self.margin = 5
+        self.margin = 0
         self.parking_margin = parking_margin
         # coordinates are in [x,y] format, 1000 coordinates
         self.car_length = car.car_length * 10
@@ -72,18 +72,28 @@ class Environment:
                 p[1] + 10 * self.margin:p[1] + 10 * self.margin + 3,
                 p[0] + 10 * self.margin:p[0] + 10 * self.margin + 3] = color
 
-    def draw_footprint(self, path):
+    def draw_footprint(self, path, is_back=True):
         # path = np.array(path) * 10
         color = np.random.randint(0, 150, 3) / 255
         # path = path.astype(int)
+        # prev_psi = None
         for i in range(len(path)):
             p = path[i]
             if i < len(path) - 1:
                 v = path[i + 1] - p
-                psi = np.arctan2(v[1], v[0])
+                if np.any(v==0):
+                    continue
+                # psi = np.arctan2(v[1], v[0])
+                psi = np.arctan(v[1] / v[0])
+                # if i != 0:
+                #     if np.abs(psi - prev_psi) > np.pi:
+                #         psi = 
+                # prev_psi = psi
+                # # if 
+
             rotated_struct = self.rotate_car(self.car_struct, angle=psi)
-            x = (p[0] - self.car.a / 2 * np.cos(psi)) * 10
-            y = (p[1] - self.car.a / 2 * np.sin(psi)) * 10
+            x = (p[0] + self.car.a / 2 * np.cos(psi)) * 10
+            y = (p[1] + self.car.a / 2 * np.sin(psi)) * 10
             # print("xy:",  x,y)
             rotated_struct += np.array([x, y]).astype(int) + \
                 np.array([10 * self.margin, 10 * self.margin])
@@ -162,6 +172,18 @@ class Environment:
         return np.any(collision_mask == 1)
         # return False
 
+    def plot(self, v, color=[0, 0, 255]):
+        v = np.array(v) * 10
+        v = v.astype(int)
+        for p in v:
+            # self.background[ob[1]*10 + 0:ob[1]*10 + 10,
+            #                 ob[0]*10 + 0:ob[0]*10 + 10] = color
+            self.background[
+                p[1] + 10 * self.margin:p[1] + 10 * self.margin + 3,
+                p[0] + 10 * self.margin:p[0] + 10 * self.margin + 3] = color
+
+    # def normalize_yaw(self, yaw):
+        
 
 class Parking1:
     def __init__(self, car, parking_length,
@@ -169,8 +191,7 @@ class Parking1:
                  last_backward_length
                  ):
         self.car = car
-        self.car_length = car.car_length * 10
-        self.car_width = car.car_width * 10
+        self.car_length = car.car_length
         self.parking_length = parking_length  # [m]
         self.last_backward_length = last_backward_length  # [m]
 
@@ -180,7 +201,7 @@ class Parking1:
         self.obs = np.array(self.walls)
 
         self.cars = np.array(
-            [[40, 35], [int(40 + self.car_length / 10 + self.parking_length), 35]])
+            [[40, 35], [int(40 + self.car_length + self.parking_length), 35]])
 
         self.end = np.mean(self.cars, axis=0, dtype=np.int64)
         self.cars -= np.array([self.end[0] - 50, 0])
@@ -188,7 +209,7 @@ class Parking1:
         self.parking_margin = parking_margin
         self.end = np.mean(self.cars, axis=0, dtype=np.int64)
         self.end -= [int(parking_length / 2 - self.parking_margin -
-                         self.car_length / 10 / 2 + self.car.a / 2
+                         self.car_length / 2 + self.car.a / 2
                          - self.last_backward_length), 0]
 
 
