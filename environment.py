@@ -224,7 +224,7 @@ class Parking1:
 
     def make_car(self):
         car_obstacle_x, car_obstacle_y = np.meshgrid(
-            np.arange(-4, 4), np.arange(-4, 4))
+            np.arange(-4, 4), np.arange(-2, 2))
         car_obstacle = np.dstack(
             [car_obstacle_x, car_obstacle_y]).reshape(-1, 2)
         # print(car_obstacle.shape)
