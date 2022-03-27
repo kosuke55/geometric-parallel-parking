@@ -88,6 +88,7 @@ class Environment:
             if i < len(path) - 1:
                 v = path[i + 1] - p
                 psi = np.arctan2(v[1], v[0])
+            print(v, psi)
             rotated_struct = self.rotate_car(self.car_struct, angle=psi)
             x = (p[0] - self.a / 2 * np.cos(psi)) * 10
             y = (p[1] - self.a / 2 * np.sin(psi)) * 10

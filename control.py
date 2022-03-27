@@ -43,19 +43,7 @@ class MPC_Controller:
         u_k = u_k.reshape(self.horiz, 2).T
         z_k = np.zeros((2, self.horiz + 1))
 
-        # desired_state = points.T
-        # transform bese_link points to vehicle_center points
-        desired_state = []
-        for i in range(len(points)):
-            if i < len(points) - 1:
-                v = points[i + 1] - points[i]
-                psi = np.arctan2(v[1], v[0])
-            a = 4.0  # todo
-            x= points[i][0] + a / 2 * np.cos(psi)
-            y = points[i][1] + a / 2 * np.sin(psi)
-            desired_state.append([x, y])
-        desired_state = np.array(desired_state).T
-
+        desired_state = points.T
         cost = 0.0
 
         for i in range(self.horiz):

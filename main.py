@@ -74,7 +74,8 @@ if __name__ == '__main__':
     key = cv2.waitKey()
 
 
-    for i, point in enumerate(path):
+    vehicle_center_path = path_planner.get_vehicle_center_path(path)
+    for i, point in enumerate(vehicle_center_path):
         if args.use_control:
             acc, delta = controller.optimize(my_car, path[i:i+MPC_HORIZON])
             my_car.update_state(my_car.move(acc,  delta))

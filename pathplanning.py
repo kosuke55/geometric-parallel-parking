@@ -51,7 +51,7 @@ class PathPlanning:
             (R_E_init_r**2 + (R_E_init_r + self.R_Elmin)**2 - C_l2E_init**2)
             / (2 * R_E_init_r * (R_E_init_r + self.R_Elmin)))
 
-        point_interval = 0.3
+        point_interval = 0.25
         path = [[sx, sy]]
         theta = 0
         while theta < beta:
@@ -61,11 +61,7 @@ class PathPlanning:
             if distance > point_interval:
                 path.append(p_current)
             theta += 0.01
-            # path.append(C_r + (R_E_init_r * np.array([np.cos(t), np.sin(t)])) - [0, 1])p
 
-            # print(C_r + R_E_init_r * np.array([np.cos(t), np.sin(t)]))
-
-        # for theta in np.linspace(beta + sphi, 0, 30):
         theta = beta + sphi
         while theta > 0:
             t = -np.pi / 2 + theta
@@ -78,4 +74,26 @@ class PathPlanning:
             np.array([np.cos(-np.pi / 2), np.sin(-np.pi / 2)])
         path.append(p_current)
 
+        last_backward_length = 1.0
+        l = 0
+        while l < last_backward_length:
+            p_current = p_current + [-point_interval, 0]
+            print(p_current)
+            path.append(p_current)
+            l += point_interval
+
         return np.array(path)
+
+    def get_vehicle_center_path(self, path):
+        # transform bese_link points to vehicle_center points
+        vehicle_center_path = []
+        for i in range(len(path)):
+            if i < len(path) - 1:
+                v = path[i + 1] - path[i]
+                psi = np.arctan2(v[1], v[0])
+            a = 4.0  # todo
+            x= path[i][0] + a / 2 * np.cos(psi)
+            y = path[i][1] + a / 2 * np.sin(psi)
+            vehicle_center_path.append([x, y])
+
+        return vehicle_center_path
