@@ -32,7 +32,9 @@ class PathPlanning:
         # self.ox = [int(item) for item in self.obs[:, 0]]
         # self.oy = [int(item) for item in self.obs[:, 1]]
 
-    def plan_path(self, sx, sy, sphi, gx, gy):
+    def plan_path(self, sx, sy, sphi, gx, gy,
+                  last_backward_length=1.0  # 1m
+                  ):
         # path = np.array([np.linspace(sx, gx, 50), np.linspace(sy, gy, 50)])
         C_l = np.array([gx, gy + self.R_Elmin])
         C_l2E_init = np.linalg.norm([sx, sy] - C_l, ord=2)
@@ -74,7 +76,6 @@ class PathPlanning:
             np.array([np.cos(-np.pi / 2), np.sin(-np.pi / 2)])
         path.append(p_current)
 
-        last_backward_length = 1.0
         l = 0
         while l < last_backward_length:
             p_current = p_current + [-point_interval, 0]
