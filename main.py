@@ -70,20 +70,18 @@ if __name__ == '__main__':
 
     res = env.render(my_car.x, my_car.y, my_car.psi, 0)
 
-
-    
-
     cv2.imshow('environment', res)
     key = cv2.waitKey()
 
     path_planner = PathPlanning(obs, my_car, parking1)
     print("start end: ", start,end)
-    path = path_planner.plan_path(
+    path, stear = path_planner.plan_path(
         start[0] - my_car.a / 2 * np.cos(np.deg2rad(args.psi_start)),
         start[1] - my_car.a / 2 * np.sin(np.deg2rad(args.psi_start)),
         np.deg2rad(args.psi_start),
         end[0], end[1],
         args.last_backward_length)
+    print(len(path), len(stear))
     env.draw_footprint(path)
     env.draw_path(path)
 
@@ -114,6 +112,15 @@ if __name__ == '__main__':
             my_car.update_state(my_car.move(acc,  delta))
             x, y, psi = my_car.x, my_car.y, my_car.psi
         else:
+            delta = stear[i]
+            if delta != stear[i-1]:
+                cv2.imshow('environment', res)
+                key = cv2.waitKey(1)
+                sleep(0.5)
+                res = env.render(x, y, psi, delta)
+                cv2.imshow('environment', res)
+                key = cv2.waitKey(1)
+                sleep(0.5)
             point = path[i]
             x = point[0]
             y = point[1]
@@ -126,7 +133,7 @@ if __name__ == '__main__':
                 psi = np.arctan(v[1] / v[0])
             x += my_car.a / 2 * np.cos(psi)
             y += my_car.a / 2 * np.sin(psi)
-            delta = 0
+                # sleep(0.3)
         res = env.render(x, y, psi, delta)
         # sleep(0.1)
         is_collision = env.check_collision(x, y, psi)

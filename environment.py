@@ -183,7 +183,6 @@ class Environment:
                 p[0] + 10 * self.margin:p[0] + 10 * self.margin + 3] = color
 
     # def normalize_yaw(self, yaw):
-        
 
 class Parking1:
     def __init__(self, car, parking_length,

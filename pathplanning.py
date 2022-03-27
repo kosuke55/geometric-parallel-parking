@@ -44,12 +44,12 @@ class PathPlanning:
                   last_backward_length
                   ):
         if self.parking.parking_length > self.L_min + last_backward_length:
-            path = self.plan_path_one_traial(
+            path, stear = self.plan_path_one_traial(
                 sx, sy, sphi, gx, gy, last_backward_length)
         else:
-            path =  self.plan_path_several_traial(
+            path, stear =  self.plan_path_several_traial(
                 sx, sy, sphi, gx, gy, last_backward_length)
-        return path
+        return path, stear
 
     def plan_path_one_traial(self, sx, sy, sphi, gx, gy,
                              last_backward_length, Cl=None, psi_last=0
@@ -76,6 +76,7 @@ class PathPlanning:
         point_interval = 0.25
         # point_interval = 1.0
         path = [[sx, sy]]
+        stear = [0]
 
         # turn right
         theta = np.pi / 2 + sphi
@@ -84,6 +85,7 @@ class PathPlanning:
             distance = np.linalg.norm([path[-1] - p_current])
             if distance > point_interval:
                 path.append(p_current)
+                stear.append(-np.arctan(self.car.a / R_E_init_r))
             theta += 0.01
 
         # turn left
@@ -95,6 +97,7 @@ class PathPlanning:
             distance = np.linalg.norm([path[-1] - p_current])
             if distance > point_interval:
                 path.append(p_current)
+                stear.append(self.car.steer_max)
             theta -= 0.01
         # path.append(p_current)
         # p_current = Cl + self.R_Elmin * \
@@ -110,7 +113,7 @@ class PathPlanning:
         #     l += point_interval
         # path.append([gx , gy])
 
-        return np.array(path)
+        return np.array(path), stear
 
     def plan_path_several_traial(self, sx, sy, sphi, gx, gy,
                                 last_backward_length
@@ -123,7 +126,7 @@ class PathPlanning:
         point_interval = 0.1
         goal = np.array([gx, gy])
         path = [[gx, gy]]
-        # path = []
+        stear = [0]
         psi = 0  # goal psi is 0
         # theta = -np.pi / 2
         print("Cl: ",Cl)
@@ -146,6 +149,7 @@ class PathPlanning:
                 distance = np.linalg.norm([path[-1] - p_current])
                 if distance > point_interval:
                     path.append(p_current)
+                    stear.append(self.car.steer_max)
                 theta += 0.01
                 # psi += 0.01
             psi = theta + np.pi / 2
@@ -179,6 +183,7 @@ class PathPlanning:
                 distance = np.linalg.norm([path[-1] - p_current])
                 if distance > point_interval:
                     path.append(p_current)
+                    stear.append(-self.car.steer_max)
                 theta += 0.01
             # path.append(p_current)
             psi = theta - np.pi / 2
@@ -187,15 +192,15 @@ class PathPlanning:
             self.Cl = Cl
             d_Cl_F = x_F - Cl[0]
         print("Cl: ",Cl)
-        retrieve_path = self.plan_path_one_traial(
+        retrieve_path, retrieve_stear = self.plan_path_one_traial(
             sx, sy, sphi, gx, gy, last_backward_length, Cl, psi)
 
         path = np.vstack((retrieve_path, path[::-1]))
+        stear = np.hstack((retrieve_stear, stear[::-1]))
         # path=retrieve_path
 
         # return np.array(path[::-1])
-        return np.array(path)
-
+        return path, stear
 
     def al_kashi(self, A, B, C):
         "calc alpha (the angle of A)"
