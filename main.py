@@ -89,14 +89,14 @@ if __name__ == '__main__':
     # env.plot([[int(end[0]), int(end[1])]])
     # env.plot([[int(end[1]), int(end[0])]])
     # env.plot([[int(x_F), int(end[1])]])
-    C_l = np.array(end + [0, path_planner.R_Elmin])    
+    C_l = np.array(end + [0, path_planner.R_Elmin])
     print(C_l)
     # env.plot([C_l])
     # env.plot([path_planner.B])
     # env.plot([path_planner.F1])
-    env.plot([path_planner.Cr])
-    env.plot([path_planner.Cl])
-    env.plot([path_planner.G2])
+    # env.plot([path_planner.Cr])
+    # env.plot([path_planner.Cl])
+    # env.plot([path_planner.G2])
     # env.plot([[int(end[1]), int(x_F)]])
 
     res = env.render(my_car.x, my_car.y, my_car.psi, 0)
@@ -113,7 +113,7 @@ if __name__ == '__main__':
             x, y, psi = my_car.x, my_car.y, my_car.psi
         else:
             delta = stear[i]
-            if delta != stear[i-1]:
+            if delta != stear[i - 1] and i > 0:
                 cv2.imshow('environment', res)
                 key = cv2.waitKey(1)
                 sleep(0.5)

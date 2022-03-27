@@ -44,7 +44,8 @@ class PathPlanning:
     def plan_path(self, sx, sy, sphi, gx, gy,
                   last_backward_length
                   ):
-        if self.parking.parking_length > self.L_min + last_backward_length:
+        if self.parking.parking_length > self.L_min + \
+                last_backward_length + self.parking.parking_margin * 2:
             path, stear = self.plan_path_one_traial(
                 sx, sy, sphi, gx, gy, last_backward_length)
         else:
@@ -57,7 +58,7 @@ class PathPlanning:
                              ):
         # path = np.array([np.linspace(sx, gx, 50), np.linspace(sy, gy, 50)])
         if Cl is None:
-            np.array([gx, gy + self.R_Elmin])
+            Cl = np.array([gx, gy + self.R_Elmin])
         d_Cl_Einit = np.linalg.norm([sx, sy] - Cl, ord=2)
         print("d_Cl_Einit: ", d_Cl_Einit)
         alpha = np.pi / 2 + sphi + np.arcsin((Cl[1] - sy) / d_Cl_Einit)
@@ -122,7 +123,7 @@ class PathPlanning:
                                  ):
         # print("too narrow !!")
         Cl = np.array([gx, gy + self.R_Elmin])
-        x_F = self.parking.cars[1][0] - self.car.car_length / 2
+        x_F = self.parking.cars[1][0] - self.car.car_length / 2 - self.parking.parking_margin
         d_Cl_F = x_F - Cl[0]
 
         point_interval = 0.1
@@ -165,7 +166,7 @@ class PathPlanning:
             J = np.array([gx - self.car.d_rear,
                           gy + self.car.b + self.car.d_l])
             J = self.transform(J, Cl, theta_l)
-            x_G = self.parking.cars[0][0] + self.car.car_length / 2
+            x_G = self.parking.cars[0][0] + self.car.car_length / 2 + self.parking.parking_margin
             y_G2 = Cr[1] + np.sqrt(self.R_Jr_min**2 - (x_G - Cr[0])**2)
 
             G2 = np.array([x_G, y_G2])
