@@ -3,14 +3,17 @@ import numpy as np
 
 
 class Environment:
-    def __init__(self, obstacles,
+    def __init__(self,
+                 obstacles,
                  car_length=80,  # 8m
                  car_width=40,  # 4m
                  wheel_length=15,  # 1.5m
                  wheel_width=7,  # 0.7m
-                 wheel_positions=np.array([[25, 15], [25, -15], [-25, 15], [-25, -15]])
+                 wheel_positions=np.array([[25, 15], [25, -15], [-25, 15], [-25, -15]]),
+                 parking_margin=1
                  ):
         self.margin = 5
+        self.parking_margin = parking_margin
         # coordinates are in [x,y] format, 1000 coordinates
         self.car_length = car_length
         self.car_width = car_width
@@ -24,10 +27,8 @@ class Environment:
         self.a = car_length / 10 - self.d_rear - self.d_front
         self.d_l = (car_width / 2 - wheel_positions[0][1]) / 10
         self.d_r = (car_width / 2 - (-wheel_positions[1][1])) / 10
-        # print(self.d_l, self.d_r)
         self.b = (car_width / 10 - self.d_l - self.d_r) / 2
         self.steer_max = np.deg2rad(40)
-        # print("self.steer_max: ", self.steer_max)
 
         self.color = np.array([0, 0, 255]) / 255
         self.wheel_color = np.array([20, 20, 20]) / 255
@@ -71,16 +72,29 @@ class Environment:
 
     def draw_path(self, path):
         path = np.array(path) * 10
-        # path = np.array(path)
         color = np.random.randint(0, 150, 3) / 255
         path = path.astype(int)
         for p in path:
-            # self.background[
-            #     p[1] + self.margin:p[1] + self.margin + 3,
-            #     p[0] + self.margin:p[0] + self.margin + 3] = color
             self.background[
                 p[1] + 10 * self.margin:p[1] + 10 * self.margin + 3,
                 p[0] + 10 * self.margin:p[0] + 10 * self.margin + 3] = color
+
+    def draw_footprint(self, path):
+        # path = np.array(path) * 10
+        color = np.random.randint(0, 150, 3) / 255
+        # path = path.astype(int)
+        for i in range(len(path)):
+            p = path[i]
+            if i < len(path) - 1:
+                v = path[i + 1] - p
+                psi = np.arctan2(v[1], v[0])
+            rotated_struct = self.rotate_car(self.car_struct, angle=psi)
+            x = (p[0] - self.a / 2 * np.cos(psi)) * 10
+            y = (p[1] - self.a / 2 * np.sin(psi)) * 10
+            # print("xy:",  x,y)
+            rotated_struct += np.array([x, y]).astype(int) + \
+                np.array([10 * self.margin, 10 * self.margin])
+            cv2.polylines(self.background, [rotated_struct], True, (0, 255, 0), thickness=1)
 
     def rotate_car(self, pts, angle=0):
         R = np.array([[np.cos(angle), -np.sin(angle)],
@@ -93,6 +107,7 @@ class Environment:
         y = int(10 * y)
         # x,y in 1000 coordinates 10=1m
         # adding car body
+
         rotated_struct = self.rotate_car(self.car_struct, angle=psi)
         rotated_struct += np.array([x, y]) + \
             np.array([10 * self.margin, 10 * self.margin])
@@ -131,7 +146,8 @@ class Environment:
         #     self.background, (new_center[0], new_center[1]), 2, [
         #         255 / 255, 150 / 255, 100 / 255], -1)
 
-        rendered = cv2.resize(np.flip(rendered, axis=0), (700, 700))
+        # rendered = cv2.resize(np.flip(rendered, axis=0), (700, 700))
+        rendered = np.flip(rendered, axis=0)
         return rendered
 
     def check_collision(self, x, y, psi):
@@ -146,13 +162,18 @@ class Environment:
             np.zeros_like(self.background),
             [rotated_struct],
             [1, 1, 1])
-        collision_mask = cv2.bitwise_and(self.obstacles_mask, car_mask)
+        collision_mask = np.flip(cv2.bitwise_and(self.obstacles_mask, car_mask), axis=0)
 
+        # cv2.imshow('collision_mask', collision_mask)
+        # key = cv2.waitKey(1)
         return np.any(collision_mask == 1)
+        # return False
 
 
 class Parking1:
-    def __init__(self, parking_length=20):
+    def __init__(self, parking_length=20,  # m
+                 parking_margin=1  # m
+                 ):
         self.car_length = 80  # in 1000 coordinates, 8m
         self.car_grid_length = int(80 / 10)
         self.car_width = 40  # in 1000 coordinates, 4m
@@ -166,13 +187,21 @@ class Parking1:
         # self.cars = {1: [[40, 34]], 2: [[40 + parking_length , 34]]}
 
         self.cars = np.array(
-            [[40, 35], [int(40 + self.car_grid_length / 2 + self.parking_length), 35]])
+            [[40, 35], [int(40 + self.car_length / 10 + self.parking_length), 35]])
 
         self.end = np.mean(self.cars, axis=0, dtype=np.int64)
         self.cars -= np.array([self.end[0] - 50, 0])
 
-        self.parking_margin = 1  # [m]
-        self.end -= [int(parking_length / 2 - self.parking_margin - self.car_length / 10 / 2), 0]
+        self.parking_margin = parking_margin
+        self.end = np.mean(self.cars, axis=0, dtype=np.int64)
+        # self.end -= [parking_length / 2 - self.parking_margin - self.car_length / 10 / 2, 0]
+        # print("end ", self.end, self.cars)
+        # d = parking_length / 2 - self.parking_margin - self.car_length / 10 / 2
+        # print(d, int(d))
+        self.a = 4.0  # self.a = car_length / 10 - self.d_rear - self.d_front
+        # print("self.a: ", self.a)
+        self.end -= [int(parking_length / 2 - self.parking_margin - self.car_length / 10 / 2 + self.a / 2), 0]
+
 
     def generate_obstacles(self):
         for car in self.cars:

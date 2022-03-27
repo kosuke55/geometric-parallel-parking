@@ -7,18 +7,17 @@ from utils import angle_of_line
 class PathPlanning:
     def __init__(self, obstacles, env):
         self.env = env
-
         self.R_Elmin = self.env.a / np.tan(self.env.steer_max)
-        # self.R_Elmin = 10
         print("self.R_Elmin: ", self.R_Elmin)
         self.R_Bl_min = np.linalg.norm([self.R_Elmin + self.env.b + self.env.d_r,
                                         self.env.a + self.env.d_front], ord=2)
         print("self.R_Bl_min: ", self.R_Bl_min)
-        # print(np.sqrt((self.R_Elmin + self.env.b + self.env.d_r)**2 + (self.env.a + self.env.d_front)**2))
-        self.L_min = self.env.d_rear + np.sqrt(self.R_Bl_min**2 - (self.env.a / np.tan(self.env.steer_max) - self.env.b - self.env.d_l)**2)
+        # self.L_min = self.env.d_rear + np.sqrt(self.R_Bl_min**2 - (
+        #     self.env.a / np.tan(self.env.steer_max) - self.env.b - self.env.d_l)**2)
+        self.L_min = self.env.d_rear + np.sqrt(self.R_Bl_min**2 - (
+            self.R_Elmin - self.env.b - self.env.d_l)**2)
         print("L_min:{} ,+margin:{}".format(self.L_min,
               self.L_min + self.env.parking_margin))
-        
 
         # self.margin = 5
         # sacale obstacles from env margin to pathplanning margin
@@ -35,7 +34,6 @@ class PathPlanning:
 
     def plan_path(self, sx, sy, sphi, gx, gy):
         # path = np.array([np.linspace(sx, gx, 50), np.linspace(sy, gy, 50)])
-
         C_l = np.array([gx, gy + self.R_Elmin])
         C_l2E_init = np.linalg.norm([sx, sy] - C_l, ord=2)
         print("C_l2E_init: ", C_l2E_init)
@@ -53,7 +51,7 @@ class PathPlanning:
             (R_E_init_r**2 + (R_E_init_r + self.R_Elmin)**2 - C_l2E_init**2)
             / (2 * R_E_init_r * (R_E_init_r + self.R_Elmin)))
 
-        point_interval = 0.5
+        point_interval = 0.3
         path = [[sx, sy]]
         theta = 0
         while theta < beta:
@@ -76,6 +74,8 @@ class PathPlanning:
             if distance > point_interval:
                 path.append(p_current)
             theta -= 0.01
-
+        p_current = C_l + self.R_Elmin * \
+            np.array([np.cos(-np.pi / 2), np.sin(-np.pi / 2)])
+        path.append(p_current)
 
         return np.array(path)
