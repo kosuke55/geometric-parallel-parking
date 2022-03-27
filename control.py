@@ -4,14 +4,43 @@ import copy
 
 
 class Car_Dynamics:
-    def __init__(self, x_0, y_0, v_0, psi_0, length, dt):
-        self.dt = dt             # sampling time
-        self.L = length          # vehicle length
+    def __init__(self,
+                 x_0,
+                 y_0,
+                 v_0,
+                 psi_0,
+                #  length,
+                 dt,
+                 car_length=8,
+                 car_width=4,
+                 wheel_length=1.5,
+                 wheel_width=0.7,
+                 # [0,0] is car's center
+                 wheel_positions=np.array(
+                     [[2.0, 1.0], [2.0, -1.0], [-2.0, 1.0], [-2.0, -1.0]])
+                 ):
+        self.dt = dt  # sampling time
+        self.L = wheel_positions[0][0] - \
+            wheel_positions[2][0]          # while_base
         self.x = x_0
         self.y = y_0
         self.v = v_0
         self.psi = psi_0
         self.state = np.array([[self.x, self.y, self.v, self.psi]]).T
+
+        self.car_length = car_length
+        self.car_width = car_width
+        self.wheel_length = wheel_length
+        self.wheel_width = wheel_width
+        self.wheel_positions = wheel_positions
+        # planningは100coordinateで計算する。以下はcarの方に移動したほうが良いかも.
+        self.d_front = car_length / 2 - wheel_positions[0][0]
+        self.d_rear = car_length / 2 - (-wheel_positions[2][0])
+        self.a = car_length - self.d_rear - self.d_front
+        self.d_l = car_width / 2 - wheel_positions[0][1]
+        self.d_r = car_width / 2 - (-wheel_positions[1][1])
+        self.b = car_width - self.d_l - self.d_r
+        self.steer_max = np.deg2rad(40)
 
     def move(self, accelerate, delta):
         x_dot = self.v * np.cos(self.psi)

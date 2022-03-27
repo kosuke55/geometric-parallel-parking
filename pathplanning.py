@@ -5,19 +5,20 @@ from utils import angle_of_line
 
 
 class PathPlanning:
-    def __init__(self, obstacles, env):
-        self.env = env
-        self.R_Elmin = self.env.a / np.tan(self.env.steer_max)
+    def __init__(self, obstacles, car, parking):
+        self.car = car
+        self.parking = parking
+        self.R_Elmin = self.car.a / np.tan(self.car.steer_max)
         print("self.R_Elmin: ", self.R_Elmin)
-        self.R_Bl_min = np.linalg.norm([self.R_Elmin + self.env.b + self.env.d_r,
-                                        self.env.a + self.env.d_front], ord=2)
+        self.R_Bl_min = np.linalg.norm([self.R_Elmin + self.car.b + self.car.d_r,
+                                        self.car.a + self.car.d_front], ord=2)
         print("self.R_Bl_min: ", self.R_Bl_min)
-        # self.L_min = self.env.d_rear + np.sqrt(self.R_Bl_min**2 - (
-        #     self.env.a / np.tan(self.env.steer_max) - self.env.b - self.env.d_l)**2)
-        self.L_min = self.env.d_rear + np.sqrt(self.R_Bl_min**2 - (
-            self.R_Elmin - self.env.b - self.env.d_l)**2)
+        # self.L_min = self.car.d_rear + np.sqrt(self.R_Bl_min**2 - (
+        #     self.car.a / np.tan(self.car.steer_max) - self.car.b - self.car.d_l)**2)
+        self.L_min = self.car.d_rear + np.sqrt(self.R_Bl_min**2 - (
+            self.R_Elmin - self.car.b - self.car.d_l)**2)
         print("L_min:{} ,+margin:{}".format(self.L_min,
-              self.L_min + self.env.parking_margin))
+              self.L_min + self.parking.parking_margin))
 
         # self.margin = 5
         # sacale obstacles from env margin to pathplanning margin
@@ -44,7 +45,7 @@ class PathPlanning:
         R_E_init_r = (C_l2E_init**2 - self.R_Elmin**2) \
             / (2 * (self.R_Elmin + C_l2E_init * np.cos(alpha)))
         print("R_E_init_r: ", R_E_init_r)
-        delta_r = np.arctan(self.env.a / R_E_init_r)
+        delta_r = np.arctan(self.car.a / R_E_init_r)
         C_r = np.array([sx + R_E_init_r * np.sin(sphi),
                        sy - R_E_init_r * np.cos(sphi)])
         print("C_r: ", C_r)
@@ -55,6 +56,8 @@ class PathPlanning:
 
         point_interval = 0.25
         path = [[sx, sy]]
+
+        # turn right
         theta = 0
         while theta < beta:
             t = np.pi / 2 + sphi + theta
@@ -64,6 +67,7 @@ class PathPlanning:
                 path.append(p_current)
             theta += 0.01
 
+        # turn left
         theta = beta + sphi
         while theta > 0:
             t = -np.pi / 2 + theta

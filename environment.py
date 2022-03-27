@@ -5,30 +5,23 @@ import numpy as np
 class Environment:
     def __init__(self,
                  obstacles,
-                 car_length=80,  # 8m
-                 car_width=40,  # 4m
-                 wheel_length=15,  # 1.5m
-                 wheel_width=7,  # 0.7m
-                 wheel_positions=np.array([[25, 15], [25, -15], [-25, 15], [-25, -15]]),
+                 car,
+                #  car_length=80,  # 8m
+                #  car_width=40,  # 4m
+                #  wheel_length=15,  # 1.5m
+                #  wheel_width=7,  # 0.7m
+                #  wheel_positions=np.array([[25, 15], [25, -15], [-25, 15], [-25, -15]]),
                  parking_margin=1
                  ):
+        self.car = car
         self.margin = 5
         self.parking_margin = parking_margin
         # coordinates are in [x,y] format, 1000 coordinates
-        self.car_length = car_length
-        self.car_width = car_width
-        self.wheel_length = wheel_length
-        self.wheel_width = wheel_width
-        self.wheel_positions = wheel_positions
-
-        # planningは100coordinateで計算する。以下はcarの方に移動したほうが良いかも.
-        self.d_front = (car_length / 2 - wheel_positions[0][0]) / 10
-        self.d_rear = (car_length / 2 - (-wheel_positions[2][0])) / 10
-        self.a = car_length / 10 - self.d_rear - self.d_front
-        self.d_l = (car_width / 2 - wheel_positions[0][1]) / 10
-        self.d_r = (car_width / 2 - (-wheel_positions[1][1])) / 10
-        self.b = (car_width / 10 - self.d_l - self.d_r) / 2
-        self.steer_max = np.deg2rad(40)
+        self.car_length = car.car_length * 10
+        self.car_width = car.car_width * 10
+        self.wheel_length = car.wheel_length * 10
+        self.wheel_width = car.wheel_width * 10
+        self.wheel_positions = car.wheel_positions * 10
 
         self.color = np.array([0, 0, 255]) / 255
         self.wheel_color = np.array([20, 20, 20]) / 255
@@ -88,10 +81,9 @@ class Environment:
             if i < len(path) - 1:
                 v = path[i + 1] - p
                 psi = np.arctan2(v[1], v[0])
-            print(v, psi)
             rotated_struct = self.rotate_car(self.car_struct, angle=psi)
-            x = (p[0] - self.a / 2 * np.cos(psi)) * 10
-            y = (p[1] - self.a / 2 * np.sin(psi)) * 10
+            x = (p[0] - self.car.a / 2 * np.cos(psi)) * 10
+            y = (p[1] - self.car.a / 2 * np.sin(psi)) * 10
             # print("xy:",  x,y)
             rotated_struct += np.array([x, y]).astype(int) + \
                 np.array([10 * self.margin, 10 * self.margin])
@@ -172,20 +164,20 @@ class Environment:
 
 
 class Parking1:
-    def __init__(self, parking_length=20,  # m
-                 parking_margin=1  # m
+    def __init__(self, car, parking_length,
+                 parking_margin,
+                 last_backward_length
                  ):
-        self.car_length = 80  # in 1000 coordinates, 8m
-        self.car_grid_length = int(80 / 10)
-        self.car_width = 40  # in 1000 coordinates, 4m
+        self.car = car
+        self.car_length = car.car_length * 10
+        self.car_width = car.car_width * 10
         self.parking_length = parking_length  # [m]
+        self.last_backward_length = last_backward_length  # [m]
 
         self.car_obstacle = self.make_car()
         self.walls = [[i, 30] for i in range(-5, 105)] +\
             [[i, 70] for i in range(-5, 105)]
         self.obs = np.array(self.walls)
-        # self.obs = None
-        # self.cars = {1: [[40, 34]], 2: [[40 + parking_length , 34]]}
 
         self.cars = np.array(
             [[40, 35], [int(40 + self.car_length / 10 + self.parking_length), 35]])
@@ -195,13 +187,9 @@ class Parking1:
 
         self.parking_margin = parking_margin
         self.end = np.mean(self.cars, axis=0, dtype=np.int64)
-        # self.end -= [parking_length / 2 - self.parking_margin - self.car_length / 10 / 2, 0]
-        # print("end ", self.end, self.cars)
-        # d = parking_length / 2 - self.parking_margin - self.car_length / 10 / 2
-        # print(d, int(d))
-        self.a = 4.0  # self.a = car_length / 10 - self.d_rear - self.d_front
-        # print("self.a: ", self.a)
-        self.end -= [int(parking_length / 2 - self.parking_margin - self.car_length / 10 / 2 + self.a / 2), 0]
+        self.end -= [int(parking_length / 2 - self.parking_margin -
+                         self.car_length / 10 / 2 + self.car.a / 2
+                         - self.last_backward_length), 0]
 
 
     def generate_obstacles(self):
