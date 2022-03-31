@@ -63,17 +63,17 @@ class PathPlanning:
         print("d_Cl_Einit: ", d_Cl_Einit)
         alpha = np.pi / 2 + sphi + np.arcsin((Cl[1] - sy) / d_Cl_Einit)
         print("alpha: ", alpha)
-        R_E_init_r = (d_Cl_Einit**2 - self.R_Elmin**2) \
+        R_Einit_r = (d_Cl_Einit**2 - self.R_Elmin**2) \
             / (2 * (self.R_Elmin + d_Cl_Einit * np.cos(alpha)))
-        print("R_E_init_r: ", R_E_init_r)
-        delta_r = np.arctan(self.car.a / R_E_init_r)
-        Cr = np.array([sx + R_E_init_r * np.sin(sphi),
-                       sy - R_E_init_r * np.cos(sphi)])
+        print("R_Einit_r: ", R_Einit_r)
+        delta_r = np.arctan(self.car.a / R_Einit_r)
+        Cr = np.array([sx + R_Einit_r * np.sin(sphi),
+                       sy - R_Einit_r * np.cos(sphi)])
         print("Cr: ", Cr)
 
         beta = np.arccos(
-            (R_E_init_r**2 + (R_E_init_r + self.R_Elmin)**2 - d_Cl_Einit**2)
-            / (2 * R_E_init_r * (R_E_init_r + self.R_Elmin)))
+            (R_Einit_r**2 + (R_Einit_r + self.R_Elmin)**2 - d_Cl_Einit**2)
+            / (2 * R_Einit_r * (R_Einit_r + self.R_Elmin)))
 
         point_interval = 0.25
         # point_interval = 1.0
@@ -83,12 +83,12 @@ class PathPlanning:
         # turn right
         theta = np.pi / 2 + sphi
         while theta < np.pi / 2 + sphi + beta:
-            p_current = Cr + R_E_init_r * \
+            p_current = Cr + R_Einit_r * \
                 np.array([np.cos(theta), np.sin(theta)])
             distance = np.linalg.norm([path[-1] - p_current])
             if distance > point_interval:
                 path.append(p_current)
-                stear.append(-np.arctan(self.car.a / R_E_init_r))
+                stear.append(-np.arctan(self.car.a / R_Einit_r))
             theta += 0.01
 
         # turn left
