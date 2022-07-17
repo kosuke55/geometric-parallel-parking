@@ -1,4 +1,4 @@
-# parallel-parking
+# geometric-parallel-parking
 
 Geometric path planning for automatic parallel parking in tiny spots [1]
 
