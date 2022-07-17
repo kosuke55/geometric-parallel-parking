@@ -3,7 +3,7 @@
 Geometric path planning for automatic parallel parking in tiny spots [1]
 
 ## RUN
-`python main.py`
+`python main.py --x_start 75 --y_start 40 --psi_start -20 --x_end 90 --y_end 80 --parking_length 12 --parking_margin 1`
 
 ### One Traial
 https://user-images.githubusercontent.com/39142679/175810486-3b592e5a-864d-42a8-a498-1e65b36e1303.mp4
@@ -16,6 +16,6 @@ https://user-images.githubusercontent.com/39142679/175810944-a3557d76-9503-4539-
 https://user-images.githubusercontent.com/39142679/175810980-01661de2-08cd-4499-a2df-240160ddaf43.mp4
 
 ## Reference
-https://github.com/Pandas-Team/Automatic-Parking
+based on https://github.com/Pandas-Team/Automatic-Parking and replaced the path planner.
 
 [1] H. Vorobieva, S. Glaser, N. Minoiu-Enache, and S. Mammar, “Geometric path planning for automatic parallel parking in tiny spots,” IFAC Proceedings Volumes, vol. 45, no. 24, pp. 36–42, 2012.
