@@ -17,7 +17,7 @@ https://user-images.githubusercontent.com/39142679/175810980-01661de2-08cd-4499-
 
 ## Application
 
-[Autoware](https://github.com/autowarefoundation/autoware) uses C++ version of this path planning. [geometric_parallel_parking.cpp](https://github.com/autowarefoundation/autoware.universe/blob/main/planning/behavior_path_planner/autoware_behavior_path_planner_common/src/utils/parking_departure/geometric_parallel_parking.cpp) is implemented in Autoware which is used in [goal_planner](https://github.com/autowarefoundation/autoware.universe/blob/main/planning/behavior_path_planner/autoware_behavior_path_planner_common/src/utils/parking_departure/geometric_parallel_parking.cpp) and [start_planner](https://autowarefoundation.github.io/autoware.universe/main/planning/behavior_path_planner/autoware_behavior_path_start_planner_module/).
+[Autoware](https://github.com/autowarefoundation/autoware) uses C++ version of this path planning. [geometric_parallel_parking.cpp](https://github.com/autowarefoundation/autoware.universe/blob/main/planning/behavior_path_planner/autoware_behavior_path_planner_common/src/utils/parking_departure/geometric_parallel_parking.cpp) is implemented in Autoware which is used in [goal_planner](https://autowarefoundation.github.io/autoware.universe/main/planning/behavior_path_planner/autoware_behavior_path_goal_planner_module/) and [start_planner](https://autowarefoundation.github.io/autoware.universe/main/planning/behavior_path_planner/autoware_behavior_path_start_planner_module/).
 
 https://github.com/autowarefoundation/autoware.universe/assets/39142679/0ddf94d5-11b1-4dff-a0fe-a1237c632191
 
